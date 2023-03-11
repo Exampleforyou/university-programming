@@ -1,3 +1,4 @@
+#1
 function gcd_(a::T, b::T) where T
     #a0, b0 = b, a % b
     while b != 0
@@ -5,26 +6,10 @@ function gcd_(a::T, b::T) where T
     end
     return a
 end
+#2
 
-function gcdx_(a::T, b::T) where T 
-    # a0, b0 = a, b
-    u1, v1 = one(T), zero(T) 
-    u2, v2 = v1, u1
-    #ИНВАРИАНТ: НОД(a,b) = HОД(a0,b0) && a = u*a0 + v*b0 && b = u_*a0 + v_ * b0
-    while b != 0
-        q = a // b
-        a, b = b, a % b
 
-        u1, u2 = u2, u1 - q*u2
-        v1, v2 = v2, v1 - q*v2
-    end
-    if a < 0
-        a, u1, v1 = -a, -u1, -v1
-    end
-    return a, u1, v1 
-end
-
-function gcdxxx(a::T, b::T) where T
+function gcdx_(a::T, b::T) where T
     u1 = 1
     u2 = 0
     v1 = 0
@@ -32,7 +17,7 @@ function gcdxxx(a::T, b::T) where T
 
     while b > 0
         
-        q, r = rem(a, b), a % b
+        q, r = rem(a, b), mod(a, b)
         a, b = b, r
 
         u1, u2 = u2, u1 - q*u2
@@ -41,18 +26,45 @@ function gcdxxx(a::T, b::T) where T
     end
     return a, u1, v1
 
-
-
-
 end
 
+
 function invmod_(a::T, M::T) where T
-    d, u, v = gcdxxx(a, M)
-    println(d, u, div(a*u, M))
-    if d == 1 && (a*u % M) == 1
+    d, u, v = gcdx_(a, M)
+    # println(d, u, mod(a*u, M))
+    if d == 1 && mod(a*u, M) == 1
+        if u < 0
+            u += M
+        end
         return u
     end
     return "Nothing"
 end
+# println(invmod_(4, 5))
 
-println(invmod_(4, 5))
+function diaphant_solve(a::T, b::T, c::T) where T
+    d, u, v = gcdx_(a, b)
+
+    if c % d != 0
+        return "Nothing"
+    end
+    
+    #     d    = a*u + b*v 
+    # c = d*c' = a*x + b*y
+    _c = c / d
+    x = u*_c
+    y = v*_c
+    return x, y
+end
+
+
+struct Residue{T, M}
+    a::T
+    Residue{T, M}(a::T) where{T, M} = new(mod(a, M))
+end
+
+
+
+R = Residue{Int, 6}(5)
+println(R.a)
+
